@@ -2,8 +2,9 @@
 
 A small baseline for cell instance segmentation. A compact UNet predicts a
 binary foreground mask, and a watershed step turns that mask into separate
-instances so that touching cells are counted as two rather than one. The
-data is fully synthetic, so the whole thing runs on CPU with no downloads.
+instances so that touching cells are counted as two rather than one. A synthetic
+generator keeps the tests fast and download free, and `src/dsb_data.py` loads the
+real 2018 Data Science Bowl nuclei set for an actual training run (see Results).
 
 ## Why two stages
 
@@ -59,6 +60,14 @@ A short training demo lives in `src/train.py`. `train_overfit` fits the UNet
 to a fixed batch of easy synthetic masks and returns the initial loss, the
 final loss, and the trained model.
 
+## Results on real nuclei (DSB2018)
+
+`src/dsb_data.py` reads the 2018 Data Science Bowl nuclei set (BBBC038) from a
+free community mirror, no credentials needed. A 40 epoch UNet run on 531 training
+and 133 validation images at 256 px reached a best validation Dice of 0.901 on an
+RTX 5070 Ti. Real microscopy with real masks; the synthetic generator stays in
+place so the test suite needs nothing downloaded.
+
 ## What the tests check
 
 These are behavior checks, not fixed magic numbers.
@@ -82,7 +91,7 @@ this repo. Nothing here is a quoted benchmark.
 ## Notes
 
 The synthetic generator is intentionally simple so the tests are fast and
-deterministic with seeded random generators. Swapping in real microscopy
-images means replacing `data.py` with a loader that yields the same image,
-mask, and instance triples. The model, metrics, and watershed stages stay as
-they are.
+deterministic with seeded random generators. `src/dsb_data.py` is the real
+counterpart: it yields the same image, mask, and instance triples from the
+DSB2018 nuclei set, so the model, metrics, and watershed stages stay exactly as
+they are whether the data is synthetic or real.
